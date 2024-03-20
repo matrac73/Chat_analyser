@@ -2,7 +2,7 @@ import re
 import pandas as pd
 
 
-def analyze_chat(chat_file):
+def analyze_chat_whatsapp(chat_file):
     with open(chat_file, 'r', encoding='utf-8') as file:
         chat_content = file.readlines()
 
@@ -37,7 +37,6 @@ def analyze_chat(chat_file):
         match = re.match(r'(\d{2}/\d{2}/\d{4}, \d{2}:\d{2}) - ([^:]+): (.+)', line)
         if match:
             user = match.group(2)
-            message = match.group(3).strip()
 
             # Update user message count
             if user in users:
@@ -45,15 +44,11 @@ def analyze_chat(chat_file):
             else:
                 users[user] = 1
 
-    # Print statistics
-    output = {}
-    output["Total messages"] = total_messages
-    output["Media shared:"] = media_shared
-    output["Emojis sent:"] = emojis_sent
-    output["Links shared:"] = links_shared
-    utilisateurs = []
+    utilisateurs = {'Noms': [], 'Messages': []}
     for user, count in users.items():
-        utilisateurs.append((user, count))
-    output["Messages per user:"] = utilisateurs
+        utilisateurs['Noms'].append(user)
+        utilisateurs['Messages'].append(count)
 
-    return pd.DataFrame(output)
+    df_utilisateurs = pd.DataFrame(utilisateurs)
+
+    return total_messages, media_shared, emojis_sent, links_shared, df_utilisateurs

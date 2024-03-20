@@ -1,5 +1,5 @@
 import gradio as gr
-from services.whatsapp import analyze_chat
+from services.whatsapp import analyze_chat_whatsapp
 
 
 def interface_calculateur():
@@ -7,11 +7,15 @@ def interface_calculateur():
             gr.components.File(label="Fichier")
             ]
     outputs = [
-            gr.components.Dataframe(label="Informations")
+            gr.components.Number(label='Messages totaux envoyés'),
+            gr.components.Number(label='Medias partagés'),
+            gr.components.Number(label='Emojis envoyés'),
+            gr.components.Number(label='Liens partagés'),
+            gr.components.Dataframe(label="messages par utilisateur")
             ]
 
     return gr.Interface(
-        analyze_chat,
+        analyze_chat_whatsapp,
         inputs=inputs,
         outputs=outputs,
         css="footer {visibility: hidden}",
