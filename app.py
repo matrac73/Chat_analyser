@@ -4,7 +4,7 @@ from services.whatsapp import analyze_chat_whatsapp
 
 def interface_calculateur():
     inputs = [
-            gr.components.File(label="Fichier")
+            gr.components.File(label="Fichier", file_count='single')
             ]
     outputs = [
             gr.components.Number(label='Messages totaux envoyés'),
