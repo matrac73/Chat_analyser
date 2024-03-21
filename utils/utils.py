@@ -63,10 +63,14 @@ class Whatsapp:
 
     def display_messages_users(self, chat_content):
         messages_per_user = self.count_messages_per_user(chat_content)
+
+        sorted_users = sorted(messages_per_user[0].items(), key=lambda x: len(x[1]), reverse=True)
+
         data = []
-        for user, messages in messages_per_user[0].items():
+        for user, messages in sorted_users:
             for time, _ in messages:
                 data.append((user, time))
+
         df = pd.DataFrame(data, columns=['User', 'Time'])
 
         pal = sns.cubehelix_palette(10, rot=-.25, light=.7)
@@ -75,7 +79,6 @@ class Whatsapp:
         echantillonage = 0.2
         g.map(sns.kdeplot, "Time", bw_adjust=echantillonage, clip_on=False, fill=True, alpha=1, linewidth=1.5)
         g.map(sns.kdeplot, "Time", clip_on=False, color="w", lw=2, bw_adjust=echantillonage)
-
         g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
 
         def label(x, color, label):
@@ -84,11 +87,7 @@ class Whatsapp:
                     ha="left", va="center", transform=ax.transAxes)
 
         g.map(label, "Time")
-
-        # Set the subplots to overlap
         g.figure.subplots_adjust(hspace=-.25)
-
-        # Remove axes details that don't play well with overlap
         g.set_titles("")
         g.set(yticks=[], ylabel="")
         g.despine(bottom=True, left=True)
