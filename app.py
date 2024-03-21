@@ -11,7 +11,9 @@ def interface_calculateur():
             gr.components.Number(label='Medias partagés'),
             gr.components.Number(label='Emojis envoyés'),
             gr.components.Number(label='Liens partagés'),
-            gr.components.Dataframe(label="messages par utilisateur")
+            gr.components.Dataframe(label="messages par utilisateur"),
+            gr.components.Image(label="Timeline"),
+            gr.components.Image(label="proportion"),
             ]
 
     return gr.Interface(
