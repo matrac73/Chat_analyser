@@ -14,6 +14,12 @@ def interface_calculateur():
             gr.components.Dataframe(label="messages par utilisateur"),
             gr.components.Image(label="Timeline"),
             gr.components.Image(label="proportion"),
+            gr.components.Dataframe(label="messages le matin"),
+            gr.components.Dataframe(label="messages la nuit"),
+            gr.components.Dataframe(label="messages qui commencent une conversation"),
+            gr.components.Dataframe(label="messages qui terminent une conversation"),
+            gr.components.Dataframe(label="nombre de mots uniques"),
+            gr.components.Dataframe(label="temps de réponse"),
             ]
 
     return gr.Interface(

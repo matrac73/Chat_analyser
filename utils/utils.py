@@ -74,10 +74,10 @@ class Whatsapp:
         df = pd.DataFrame(data, columns=['User', 'Time'])
 
         pal = sns.cubehelix_palette(10, rot=-.25, light=.7)
-        g = sns.FacetGrid(df, row="User", hue="User", aspect=15, height=1.5, palette=pal)
+        g = sns.FacetGrid(df, row="User", hue="User", aspect=15, height=1.5, palette=pal, sharey=False)
 
-        echantillonage = 0.2
-        g.map(sns.kdeplot, "Time", bw_adjust=echantillonage, clip_on=False, fill=True, alpha=1, linewidth=1.5)
+        echantillonage = 0.1
+        g.map(sns.kdeplot, "Time", bw_adjust=echantillonage, clip_on=False, fill=True, alpha=0.8, linewidth=1.5)
         g.map(sns.kdeplot, "Time", clip_on=False, color="w", lw=2, bw_adjust=echantillonage)
         g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
 
@@ -133,3 +133,64 @@ class Whatsapp:
         plt.close()
 
         return temp_file
+
+    def messages_in_morning(self, user_messages):
+        metrics = {'participants': [], 'heuristique': []}
+        for user, messages in user_messages.items():
+            morning_count = len([msg for msg in messages if 8 <= msg[0].hour or msg[0].hour < 12])
+            metrics['participants'].append(user)
+            metrics['heuristique'].append(morning_count)
+        metrics = pd.DataFrame(metrics)
+        metrics = metrics.sort_values(by='heuristique', ascending=False)
+        return metrics
+
+    def messages_in_night(self, user_messages):
+        metrics = {'participants': [], 'heuristique': []}
+        for user, messages in user_messages.items():
+            night_count = len([msg for msg in messages if 22 <= msg[0].hour or msg[0].hour < 6])
+            metrics['participants'].append(user)
+            metrics['heuristique'].append(night_count)
+        metrics = pd.DataFrame(metrics)
+        metrics = metrics.sort_values(by='heuristique', ascending=False)
+        return metrics
+
+    def start_conversation(self, user_messages):
+        metrics = {'participants': [], 'heuristique': []}
+        for user, messages in user_messages.items():
+            conversation_starts = len([msg for i, msg in enumerate(messages) if i == 0 or (i > 0 and (messages[i-1][0] - msg[0]).seconds > 3600)])
+            metrics['participants'].append(user)
+            metrics['heuristique'].append(conversation_starts)
+        metrics = pd.DataFrame(metrics)
+        metrics = metrics.sort_values(by='heuristique', ascending=False)
+        return metrics
+
+    def end_conversation(self, user_messages):
+        metrics = {'participants': [], 'heuristique': []}
+        for user, messages in user_messages.items():
+            conversation_ends = len([msg for i, msg in enumerate(messages) if i == len(messages)-1 or (i < len(messages)-1 and (messages[i+1][0] - msg[0]).seconds > 3600)])
+            metrics['participants'].append(user)
+            metrics['heuristique'].append(conversation_ends)
+        metrics = pd.DataFrame(metrics)
+        metrics = metrics.sort_values(by='heuristique', ascending=False)
+        return metrics
+
+    def unique_words(self, user_messages):
+        metrics = {'participants': [], 'heuristique': []}
+        for user, messages in user_messages.items():
+            unique_words_count = len(set(word for msg in messages for word in msg[1].split()))
+            metrics['participants'].append(user)
+            metrics['heuristique'].append(unique_words_count)
+        metrics = pd.DataFrame(metrics)
+        metrics = metrics.sort_values(by='heuristique', ascending=False)
+        return metrics
+
+    def average_response_time(self, user_messages):
+        metrics = {'participants': [], 'heuristique': []}
+        for user, messages in user_messages.items():
+            response_times = [(messages[i][0] - messages[i-1][0]).seconds for i in range(1, len(messages)) if (messages[i][0] - messages[i-1][0]).total_seconds() < 12*3600]
+            average_time = sum(response_times) / len(response_times) if response_times else 0
+            metrics['participants'].append(user)
+            metrics['heuristique'].append(round(average_time))
+        metrics = pd.DataFrame(metrics)
+        metrics = metrics.sort_values(by='heuristique', ascending=True)
+        return metrics
